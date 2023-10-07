@@ -21,7 +21,6 @@ func Copy(src, dst string) error {
 
 	// execute cp recursively from src to dst
 	cpCmd := exec.Command("cp", "-r", src, dst)
-	fmt.Println(cpCmd.String())
 	if err := cpCmd.Run(); err != nil {
 		return fmt.Errorf("copy operation failed: %v", err)
 	}
