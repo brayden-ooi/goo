@@ -43,26 +43,6 @@ func CheckPathExist(path string) (bool, error) {
 	}
 }
 
-// git logic handler
-func HandleGit() error {
-	// // initialize Git
-	// if err := exec.Command("git", "init").Run(); err != nil {
-	// 	return err
-	// }
-
-	// // create .gitignore
-	// f, err := os.Create(".gitignore")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer f.Close()
-
-	// // write into
-	// f.Write()
-
-	return nil
-}
-
 // https://stackoverflow.com/questions/26152901/replace-a-line-in-text-file-golang
 func ReplaceText(fileName, prevTxt, nextTxt string) error {
 	input, err := os.ReadFile(fileName)

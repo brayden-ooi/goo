@@ -9,12 +9,13 @@ import (
 )
 
 func (handler Handler) LG(init string) error {
-	err := utils.Copy(utils.GetProjectPath(handler.TemplatePath)("template-lg"), handler.Name)
+	getTemplatePath := utils.GetProjectPath(handler.TemplatePath)
+	getPath := utils.GetProjectPath(handler.Name)
+
+	err := utils.Copy(getTemplatePath("template-lg"), handler.Name)
 	if err != nil {
 		return err
 	}
-
-	getPath := utils.GetProjectPath(handler.Name)
 
 	// additional steps to perform
 	// rename main.txt to main.go
@@ -35,21 +36,30 @@ func (handler Handler) LG(init string) error {
 		return err
 	}
 
+	// create .gitignore
+	err = utils.Copy(
+		getTemplatePath(".gitignore"),
+		getPath(".gitignore"))
+	if err != nil {
+		return err
+	}
+
 	// exec go mod init
 	err = os.Chdir(getPath(""))
 	if err != nil {
 		return fmt.Errorf("cd operation failed: %v", err)
 	}
 
-	initCmd := exec.Command("go", "mod", "init", init)
-	err = initCmd.Run()
+	err = exec.Command("go", "mod", "init", init).Run()
 	if err != nil {
 		return err
 	}
 
-	// if err := utils.HandleGit(); err != nil {
-	// 	return err
-	// }
+	// git init
+	err = exec.Command("git", "init").Run()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
