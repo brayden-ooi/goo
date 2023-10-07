@@ -11,28 +11,44 @@ import (
 // https://opensource.com/article/18/6/copying-files-go
 func Copy(src, dst string) error {
 	// if dst already exist, throw
-	if _, err := os.Stat(dst); err == nil {
+	isFileExist, err := CheckPathExist(dst)
+	if isFileExist {
 		return fmt.Errorf("path `%s` already exist", dst)
-	} else if err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			return err
-		}
+	}
+	if err != nil {
+		return err
 	}
 
 	// execute cp recursively from src to dst
-	if err := exec.Command("cp", "-r", src, dst).Run(); err != nil {
-		return err
+	cpCmd := exec.Command("cp", "-r", src, dst)
+	fmt.Println(cpCmd.String())
+	if err := cpCmd.Run(); err != nil {
+		return fmt.Errorf("copy operation failed: %v", err)
 	}
 
 	return nil
 }
 
+func CheckPathExist(path string) (bool, error) {
+	_, err := os.Stat(path)
+
+	if err == nil {
+		return true, nil
+	} else {
+		if errors.Is(err, os.ErrNotExist) {
+			return false, nil
+		} else {
+			return false, err
+		}
+	}
+}
+
 // git logic handler
 func HandleGit() error {
-	// initialize Git
-	if err := exec.Command("git", "init").Run(); err != nil {
-		return err
-	}
+	// // initialize Git
+	// if err := exec.Command("git", "init").Run(); err != nil {
+	// 	return err
+	// }
 
 	// // create .gitignore
 	// f, err := os.Create(".gitignore")
@@ -58,7 +74,7 @@ func ReplaceText(fileName, prevTxt, nextTxt string) error {
 
 	for i, line := range lines {
 		if strings.Contains(line, prevTxt) {
-			lines[i] = nextTxt
+			lines[i] = strings.ReplaceAll(line, prevTxt, nextTxt)
 		}
 	}
 
@@ -66,7 +82,7 @@ func ReplaceText(fileName, prevTxt, nextTxt string) error {
 
 	err = os.WriteFile(fileName, []byte(output), 0644)
 	if err != nil {
-		return err
+		return fmt.Errorf("replace text operation failed: %v", err)
 	}
 
 	return nil

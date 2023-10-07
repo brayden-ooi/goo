@@ -4,34 +4,12 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"strings"
 
 	template "github.com/brayden-ooi/goo/internal/template"
 	"github.com/spf13/cobra"
 )
-
-func validateName(input *string) (string, error) {
-	// Check if the name is empty or contains invalid characters
-	if *input == "" || strings.ContainsAny(*input, "/\\:*?\"<>|") {
-		return "", errors.New("invalid project name")
-	}
-
-	return *input, nil
-}
-
-func validateSize(input *string) (string, error) {
-	switch *input {
-	case "sm":
-		return "sm", nil
-	case "lg":
-		return "lg", nil
-	default:
-		return "", errors.New("invalid size argument. Available options: sm | lg")
-	}
-}
 
 // TemplateCmd represents the now command
 var TemplateCmd = &cobra.Command{
@@ -41,40 +19,43 @@ var TemplateCmd = &cobra.Command{
 Refer to the link below for more information 
 https://github.com/golang-standards/project-layout`,
 	Run: func(cmd *cobra.Command, args []string) {
-		name, err := validateName(ProjectName)
+		handler, err := template.NewHandler(
+			*ProjectName,
+			*ProjectSize,
+			*TemplatePath,
+		)
 		if err != nil {
-			log.Fatal("something went wrong: ", err)
-		}
-
-		size, err := validateSize(ProjectSize)
-		if err != nil {
-			log.Fatal("something went wrong: ", err)
+			log.Fatal(err)
 		}
 
 		// additional validation and operations based on size
-		switch size {
+		switch handler.Size {
 		case "sm":
-			err = template.HandlerSM(name)
+			err = handler.SM()
 
 		case "lg":
-			// go mod init will handle the validation and exiting for invalid ProjectInit
-			err = template.HandlerLG(name, *ProjectInit)
+			if *ProjectInit == "" {
+				log.Fatal("init validation failed: Please provide a valid path for `go mod init`")
+			}
+			err = handler.LG(*ProjectInit)
 		}
 
 		if err != nil {
-			log.Fatal("something went wrong: ", err)
+			log.Fatal(err)
 		}
 	},
 }
 
-var ProjectName *string // required
-var ProjectSize *string // defaults to sm
-var ProjectInit *string // only required for lg projects
+var ProjectName *string  // required
+var ProjectSize *string  // defaults to sm
+var ProjectInit *string  // only required for lg projects
+var TemplatePath *string // custom paths to templates
 
 func init() {
 	ProjectName = TemplateCmd.Flags().StringP("name", "n", "", "Name for the project")
 	ProjectSize = TemplateCmd.Flags().StringP("size", "s", "sm", "Preset templates to generate. Available options: sm | lg")
 	ProjectInit = TemplateCmd.Flags().StringP("init", "i", "", "Repo path for the project. Used in `go mod init` and only required for lg projects")
+	TemplatePath = TemplateCmd.Flags().StringP("tmp", "t", "./goo/assets", "Template path for the project. Should consist of a `template-lg` and `template-sm` subdirectories. Default: ./goo")
 
 	// required
 	if err := TemplateCmd.MarkFlagRequired("name"); err != nil {
