@@ -18,7 +18,7 @@ func (handler Handler) LG(init string) error {
 	}
 
 	// change the permission
-	err = os.Chmod(handler.Name, 0755)
+	err = handlePermissions(handler.Name)
 	if err != nil {
 		return err
 	}
@@ -43,9 +43,10 @@ func (handler Handler) LG(init string) error {
 	}
 
 	// create .gitignore
-	err = utils.Copy(
+	err = HandleGitIgnore(
 		getTemplatePath(".gitignore"),
-		getPath(".gitignore"))
+		getPath(".gitignore"),
+	)
 	if err != nil {
 		return err
 	}

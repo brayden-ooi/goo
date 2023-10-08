@@ -17,13 +17,13 @@ func (handler Handler) SM() error {
 	}
 
 	// change the permission
-	err := os.Chmod(handler.Name, 0755)
+	err := handlePermissions(handler.Name)
 	if err != nil {
 		return err
 	}
 
 	// create .gitignore
-	err = utils.Copy(
+	err = HandleGitIgnore(
 		getTemplatePath(".gitignore"),
 		getPath(".gitignore"))
 	if err != nil {

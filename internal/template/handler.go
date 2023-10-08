@@ -3,6 +3,9 @@ package create
 import (
 	"errors"
 	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/brayden-ooi/goo/internal/utils"
@@ -73,6 +76,38 @@ func validateTemplatePath(templatePath string) error {
 	err = checkTemplateExist(getPath(".gitignore"))
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func handlePermissions(path string) error {
+	err := filepath.WalkDir(path, func(path string, di fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		err = os.Chmod(path, 0755)
+
+		return err
+	})
+
+	if err != nil {
+		return fmt.Errorf("could not chmod recursively: %v", path)
+	}
+
+	return nil
+}
+
+func HandleGitIgnore(src, dst string) error {
+	err := utils.Copy(src, dst)
+	if err != nil {
+		return fmt.Errorf("copy .gitignore operation failed: %v", err)
+	}
+
+	err = os.Chmod(dst, 0755)
+	if err != nil {
+		return fmt.Errorf("update .gitignore permission operation failed: %v", err)
 	}
 
 	return nil
