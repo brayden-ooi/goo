@@ -7,6 +7,7 @@ import (
 	"log"
 
 	template "github.com/brayden-ooi/goo/internal/template"
+	"github.com/brayden-ooi/goo/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -51,10 +52,16 @@ var ProjectInit *string  // only required for lg projects
 var TemplatePath *string // custom paths to templates
 
 func init() {
+	// grab installed asset path
+	defaultPath, err := utils.GetDefaultTemplatePath()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	ProjectName = TemplateCmd.Flags().StringP("name", "n", "", "Name for the project")
 	ProjectSize = TemplateCmd.Flags().StringP("size", "s", "sm", "Preset templates to generate. Available options: sm | lg")
 	ProjectInit = TemplateCmd.Flags().StringP("init", "i", "", "Repo path for the project. Used in `go mod init` and only required for lg projects")
-	TemplatePath = TemplateCmd.Flags().StringP("tmp", "t", "./goo/assets", "Template path for the project. Should consist of a `template-lg` and `template-sm` subdirectories. Default: ./goo")
+	TemplatePath = TemplateCmd.Flags().StringP("tmp", "t", defaultPath, "Template path for the project. Should consist of a `template-lg` and `template-sm` subdirectories. Default: ./goo")
 
 	// required
 	if err := TemplateCmd.MarkFlagRequired("name"); err != nil {

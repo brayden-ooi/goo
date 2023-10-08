@@ -3,8 +3,10 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"go/build"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -71,4 +73,29 @@ func GetProjectPath(projectName string) func(string) string {
 	return func(fileName string) string {
 		return fmt.Sprintf("%s/%s", projectName, fileName)
 	}
+}
+
+func GetDefaultTemplatePath() (string, error) {
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+	grandparent := filepath.Join(gopath, "pkg", "mod", "github.com", "brayden-ooi")
+	entries, err := os.ReadDir(grandparent)
+	if err != nil {
+		return "", err
+	}
+	var parent string
+
+	for _, dirname := range entries {
+		if strings.ContainsAny(dirname.Name(), "goo") {
+			parent = dirname.Name()
+		}
+	}
+
+	if parent == "" {
+		return "", errors.New("could not retrieve default template path")
+	}
+
+	return filepath.Join(grandparent, parent, "assets"), nil
 }
