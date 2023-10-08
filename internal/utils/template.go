@@ -61,7 +61,7 @@ func ReplaceText(fileName, prevTxt, nextTxt string) error {
 
 	output := strings.Join(lines, "\n")
 
-	err = os.WriteFile(fileName, []byte(output), 0644)
+	err = os.WriteFile(fileName, []byte(output), 0755)
 	if err != nil {
 		return fmt.Errorf("replace text operation failed: %v", err)
 	}
