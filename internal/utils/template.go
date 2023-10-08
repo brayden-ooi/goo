@@ -88,7 +88,7 @@ func GetDefaultTemplatePath() (string, error) {
 	var parent string
 
 	for _, dirname := range entries {
-		if strings.ContainsAny(dirname.Name(), "goo") {
+		if strings.Contains(dirname.Name(), "goo") {
 			parent = dirname.Name()
 		}
 	}
