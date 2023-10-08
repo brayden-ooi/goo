@@ -4,7 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	template "github.com/brayden-ooi/goo/internal/template"
@@ -59,7 +58,7 @@ func init() {
 
 	// required
 	if err := TemplateCmd.MarkFlagRequired("name"); err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	// Here you will define your flags and configuration settings.
