@@ -17,6 +17,12 @@ func (handler Handler) LG(init string) error {
 		return err
 	}
 
+	// change the permission
+	err = os.Chmod(handler.Name, 0755)
+	if err != nil {
+		return err
+	}
+
 	// additional steps to perform
 	// rename main.txt to main.go
 	err = os.Rename(getPath("main.txt"), getPath("main.go"))
