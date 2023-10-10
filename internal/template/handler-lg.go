@@ -2,8 +2,10 @@ package create
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/brayden-ooi/goo/internal/utils"
 )
@@ -24,6 +26,23 @@ func (handler Handler) LG(init string) error {
 	}
 
 	// additional steps to perform
+	// cleanup .goo files.
+	// .goo files are created to preserve template structure
+	err = filepath.WalkDir(handler.Name, func(path string, di fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if di.Name() == ".goo" {
+			err = os.Remove(path)
+		}
+
+		return err
+	})
+	if err != nil {
+		return fmt.Errorf("could not remove .goo files: %v", err)
+	}
+
 	// rename main.txt to main.go
 	err = os.Rename(getPath("main.txt"), getPath("main.go"))
 	if err != nil {
