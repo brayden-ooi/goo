@@ -26,8 +26,7 @@ Goo is a CLI tool dedicated to scaffold a Go project of which the structure foll
 
 4. Example for an `sm` project: `goo now --name=foo`
 5. Example for an `lg` project: `goo now --name=foo --size=lg --init=github.com/foo/foo`
-6. 
-7. This CLI tool is not supported for Windows
+6. This CLI tool is not supported for Windows
 
 ### Customizing the templates
 1. You can pass in a custom directory into the CLI using the `tmp` flag, provided it has both `template-sm` and `template-lg` subdirectories
