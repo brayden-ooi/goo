@@ -20,9 +20,28 @@ var TemplateCmd = &cobra.Command{
 Refer to the link below for more information 
 https://github.com/golang-standards/project-layout`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// validation, either name or init must be populated
+		if *ProjectName == "" && *ProjectInit == "" {
+			log.Fatal("invalid arguments. Please supply either a name or an init")
+		}
+
+		var size string
+
+		if *ProjectInit != "" {
+			size = "lg"
+
+			// add a default name if not supplied
+			if *ProjectName == "" {
+				temp := strings.Split(*ProjectInit, "/")
+				*ProjectName = temp[len(temp)-1]
+			}
+		} else {
+			size = "sm"
+		}
+
 		handler, err := template.NewHandler(
 			*ProjectName,
-			*ProjectSize,
+			size,
 			*TemplatePath,
 		)
 		if err != nil {
@@ -48,7 +67,6 @@ https://github.com/golang-standards/project-layout`,
 }
 
 var ProjectName *string  // required for sm projects, lg projects can supply one to override the default name
-var ProjectSize *string  // if init is populated, lg, else if name is populated, sm
 var ProjectInit *string  // required for lg projects
 var TemplatePath *string // custom paths to templates
 
@@ -62,23 +80,6 @@ func init() {
 	ProjectName = TemplateCmd.Flags().StringP("name", "n", "", "Name for the project")
 	ProjectInit = TemplateCmd.Flags().StringP("init", "i", "", "Repo path for the project. Used in `go mod init` and only required for lg projects")
 	TemplatePath = TemplateCmd.Flags().StringP("tmp", "t", defaultPath, "Template path for the project. Should consist of a `template-lg` and `template-sm` subdirectories. Default: ./goo")
-
-	// validation, either name or init must be populated
-	if *ProjectName == "" && *ProjectInit == "" {
-		log.Fatal(err)
-	}
-
-	if *ProjectInit != "" {
-		*ProjectSize = "lg"
-
-		// add a default name if not supplied
-		if *ProjectName == "" {
-			temp := strings.Split(*ProjectInit, "/")
-			*ProjectName = temp[len(temp)-1]
-		}
-	} else {
-		*ProjectSize = "sm"
-	}
 
 	// Here you will define your flags and configuration settings.
 
