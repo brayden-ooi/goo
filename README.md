@@ -19,15 +19,14 @@ Goo is a CLI tool dedicated to scaffold a Go project of which the structure foll
 
 2. You can now use the CLI tool to scaffold projects
 3. Use `goo now` along with the following flags to scaffold projects
-  - `size (s)`: `sm` | `lg` (default: `sm`)
-  - `name (n)`: name of the project (required)
-  - `init (i)`: the url to be used for `go mod init` (required for `lg` projects)
+  - `name (n)`: name of the project (required for `sm`)
+  - `init (i)`: the url to be used for `go mod init` (if `init` is passed in, size will be implicitly set to `lg`, otherwise `sm`)
   - `tmp (t)`: custom path to store project templates (optional)
 
 4. Example for an `sm` project: `goo now --name=foo`
-5. Example for an `lg` project: `goo now --name=foo --size=lg --init=github.com/foo/foo`
-6. 
-7. This CLI tool is not supported for Windows
+5. Example for an `lg` project: `goo now --init=github.com/foo/foo`
+   
+6. This CLI tool is not supported for Windows
 
 ### Customizing the templates
 1. You can pass in a custom directory into the CLI using the `tmp` flag, provided it has both `template-sm` and `template-lg` subdirectories

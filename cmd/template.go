@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"log"
+	"strings"
 
 	template "github.com/brayden-ooi/goo/internal/template"
 	"github.com/brayden-ooi/goo/internal/utils"
@@ -46,9 +47,9 @@ https://github.com/golang-standards/project-layout`,
 	},
 }
 
-var ProjectName *string  // required
-var ProjectSize *string  // defaults to sm
-var ProjectInit *string  // only required for lg projects
+var ProjectName *string  // required for sm projects, lg projects can supply one to override the default name
+var ProjectSize *string  // if init is populated, lg, else if name is populated, sm
+var ProjectInit *string  // required for lg projects
 var TemplatePath *string // custom paths to templates
 
 func init() {
@@ -59,13 +60,24 @@ func init() {
 	}
 
 	ProjectName = TemplateCmd.Flags().StringP("name", "n", "", "Name for the project")
-	ProjectSize = TemplateCmd.Flags().StringP("size", "s", "sm", "Preset templates to generate. Available options: sm | lg")
 	ProjectInit = TemplateCmd.Flags().StringP("init", "i", "", "Repo path for the project. Used in `go mod init` and only required for lg projects")
 	TemplatePath = TemplateCmd.Flags().StringP("tmp", "t", defaultPath, "Template path for the project. Should consist of a `template-lg` and `template-sm` subdirectories. Default: ./goo")
 
-	// required
-	if err := TemplateCmd.MarkFlagRequired("name"); err != nil {
+	// validation, either name or init must be populated
+	if *ProjectName == "" && *ProjectInit == "" {
 		log.Fatal(err)
+	}
+
+	if *ProjectInit != "" {
+		*ProjectSize = "lg"
+
+		// add a default name if not supplied
+		if *ProjectName == "" {
+			temp := strings.Split(*ProjectInit, "/")
+			*ProjectName = temp[len(temp)-1]
+		}
+	} else {
+		*ProjectSize = "sm"
 	}
 
 	// Here you will define your flags and configuration settings.
