@@ -24,7 +24,7 @@ Goo is a CLI tool dedicated to scaffold a Go project of which the structure foll
   - `tmp (t)`: custom path to store project templates (optional)
 
 4. Example for an `sm` project: `goo now --name=foo`
-5. Example for an `lg` project: `goo now --name=foo --size=lg --init=github.com/foo/foo`
+5. Example for an `lg` project: `goo now --init=github.com/foo/foo`
 6. This CLI tool is not supported for Windows
 
 ### Customizing the templates
